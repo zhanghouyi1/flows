@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+        canvas {
+            display: block;
+            width: 1000px;
+            height: 600px;
+            background: conic-gradient(#eee 25%, white 0deg 50%, #eee 0deg 75%, white 0deg) 0 / 20px 20px;
+            margin-inline: auto;
+        }
+
+        @media (max-width: 640px) {
+            canvas {
+                width: 100vw;
+                height: 60vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="2000" height="1200"></canvas>
+    <script type="text/javascript">
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        // 绘制尺寸
+        let width = canvas.width;
+        let height = canvas.height;
+
+        // 两个方块的坐标、尺寸，颜色等数据
+        let data = [
+            {
+                x: 400,
+                y: 180,
+                width: 300,
+                height: 180,
+                color: 'deepskyblue',
+                type: 1,
+                src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                title: '标题3',
+                child: [
+                    {
+                        x: 200,
+                        y: 680,
+                        width: 200,
+                        height: 180,
+                        color: 'deeppink',
+                        src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                        title: '标题4',
+                        type: 2,
+                        child: [
+                            {
+                                x: 100,
+                                y: 880,
+                                width: 200,
+                                height: 180,
+                                color: 'deeppink',
+                                type: 3,
+                                src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                                title: '标题5',
+                            }
+                        ]
+                    },
+                    {
+                        x: 500,
+                        y: 680,
+                        width: 200,
+                        height: 180,
+                        color: 'red',
+                        type: 2,
+                        src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                        title: '标题6',
+                        child: [
+                            {
+                                x: 500,
+                                y: 880,
+                                width: 200,
+                                height: 180,
+                                color: 'deeppink',
+                                type: 3,
+                                src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                                title: '标题5',
+                            }
+                        ]
+                    },
+                    {
+                        x: 800,
+                        y: 680,
+                        width: 200,
+                        height: 180,
+                        color: 'red',
+                        type: 2,
+                        title: '标题7',
+                        src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                    },
+                ]
+            },
+        ];
+        /*初始化数据 并监听所有img加载完毕 并缓存下来 图片资源只能第一次加载 不然会出现闪屏*/
+        function initData(imgUrls) {
+            const _load = function (imgUrl) {
+                //创建img标签
+                let img = new Image();
+                img.src = imgUrl.src;
+                //跨域选项
+                img.setAttribute("crossOrigin", 'Anonymous');
+                return new Promise((resolve, reject) => {
+                    //文件加载完毕
+                    img.onload = function () {
+                        resolve(img);
+                        imgUrl.url = img
+                    };
+                });
+
+            }
+            /*存promise*/
+            let loadedImageUrls = [];
+            const _loadAll = function (imgUrls) {
+                for (var i = 0, len = imgUrls.length; i < len; i++) {
+                    const result = _load(imgUrls[i]);
+                    imgUrls[i].src = result
+                    loadedImageUrls.push(result);
+                    if (imgUrls[i]?.child?.length) {
+                        _loadAll(imgUrls[i]?.child)
+                    }
+                }
+                return loadedImageUrls
+            }
+            return Promise.all(_loadAll(imgUrls))
+        }
+        initData(data).then(res => {
+            draw();
+        })
+        // 拖拽数据存储
+        let store = {};
+        // 绘制矩形方法
+        function drawRect(list) {
+            list.forEach(item => {
+
+                context.save();
+                let size = 2 * 50;
+
+                //长方体
+                context.beginPath();
+                context.fillStyle = item.color;
+                context.fillRect(item.x, item.y, item.width, item.height);
+                //文字
+                context.fillStyle = '#000'
+                context.font = '40px 宋体'
+                context.fillText(item.title, item.x, item.y + 66 + 38);
+                //头像
+                context.arc(item.x + 30, item.y + 30, 30, 0, 2 * Math.PI);
+                context.clip();
+                context.drawImage(item.url, item.x - 30, item.y - 30, size, size);
+                context.restore();
+                //结束
+                context.closePath();
+
+                //遍历
+                if (item?.child?.length) {
+                    drawRect(item.child)
+                }
+            });
+        };
+
+        // 绘制连接曲线方法
+        function drawCurve(list) {
+            // 知道上下数据
+            list.forEach(item => {
+                let from = item;
+                if (item?.child?.length) {
+                    item?.child?.forEach(h => {
+                        let to = h;
+                        // 曲线的起点终点
+                        const fromX = from.x + from.width / 2;
+                        const fromY = from.y < to.y ? from.y + from.height : from.y;
+                        const toX = to.x + to.width / 2;
+                        const toY = from.y < to.y ? to.y : to.y + to.height;
+
+                        // 曲线控制点坐标
+                        const cp1x = fromX;
+                        const cp1y = fromY + (toY - fromY) / 2;
+
+                        const cp2x = toX;
+                        const cp2y = toY - (toY - fromY) / 2;
+
+                        // 开始绘制曲线
+                        context.beginPath();
+                        context.lineWidth = 4;
+                        context.strokeStyle = '#000';
+                        context.moveTo(fromX, fromY);
+                        // 绘制曲线点
+                        context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, toX, toY);
+                        context.stroke();
+                    })
+                    drawCurve(item.child)
+                }
+
+            })
+        };
+        // 绘制方法
+        function draw() {
+            context.clearRect(0, 0, width, height);
+            drawCurve(data);
+            drawRect(data);
+
+        };
+
+        //是否点击头像
+        let resultImg = null
+        let resultText = null
+        function isClickImg(list, x, y) {
+
+            list.forEach((obj, index) => {
+                console.log(x, y, obj.x, obj.y )
+                if (x >= obj.x && x <= obj.x + 60 && y >= obj.y && y <= obj.y + 60) {
+                    console.log(111)
+                    resultImg = obj
+                }
+                if (x >= obj.x && x <= obj.x + 100 && y >= obj.y + 60 && y <= obj.y + 100) {
+console.log(222)
+                    resultText = obj
+                }
+                if (obj?.child?.length) {
+                    isClickImg(obj.child, x, y)
+                }
+            });
+        }
+
+
+        // 是否在矩形内
+        function isPointInSquare(list, x, y) {
+            // 两个矩形的绘制数据
+            list.some((obj, index) => {
+                if (x >= obj.x && x <= obj.x + obj.width && y >= obj.y && y <= obj.y + obj.height) {
+                    console.log('ooo', obj)
+                    store = obj
+                }
+                if (obj?.child?.length) {
+                    isPointInSquare(obj.child, x, y)
+                }
+            });
+
+        };
+        //注册点击事件
+
+        // 拖拽方块
+        canvas.addEventListener('mousedown', function (e) {
+            console.log('1')
+            // 判断坐标是否在图形之内
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            resultImg = null;
+            resultText = null;
+            // canvas 画布的偏移
+            const bound = canvas.getBoundingClientRect();
+            // 点击坐标
+            const clickX = clientX - bound.left;
+            const clickY = clientY - bound.top;
+            // 缩放比例
+            const scaleX = width / bound.width;
+            const scaleY = height / bound.height;
+            console.log('scaleX', scaleX)
+            // 转换为canvas坐标
+            const x = clickX * scaleX;
+            const y = clickY * scaleY;
+            //判定是否点击头像
+            isClickImg(data, x, y)
+
+            console.log('点击头像', resultImg)
+            //是否点击文字
+            console.log('点击文字', resultText)
+            //判定是否点击文字
+            // 此时可以判断是不是在范围内了
+            // 这里的图形比较简单，就不使用 isPointInPath 方法判断了
+            isPointInSquare(data, x, y);
+            // 记住位置
+            store.clientX = clientX;
+            store.clientY = clientY;
+            // 目标元素
+            store.dataMatch = store;
+            // 记住初始位置
+            store.originX = store.dataMatch.x;
+            store.originY = store.dataMatch.y;
+            // 记住缩放比例
+            store.scaleX = scaleX;
+            store.scaleY = scaleY;
+            document.addEventListener('mousemove', function (event) {
+                if (!store?.x) {
+                    return;
+                }
+                event.preventDefault();
+                // 需要移动的坐标
+                const dataMatch = store.dataMatch;
+                // 此时的偏移大小
+                const distanceX = (event.clientX - store.clientX) * store.scaleX;
+                const distanceY = (event.clientY - store.clientY) * store.scaleY;
+
+                dataMatch.x = store.originX + distanceX;
+                dataMatch.y = store.originY + distanceY;
+
+                // 边界判断
+                if (dataMatch.x < 0) {
+                    dataMatch.x = 0;
+                } else if (dataMatch.x + dataMatch.width > width) {
+                    dataMatch.x = width - dataMatch.width;
+                }
+
+                if (dataMatch.y < 0) {
+                    dataMatch.y = 0;
+                } else if (dataMatch.y + dataMatch.height > height) {
+                    dataMatch.y = height - dataMatch.height;
+                }
+                // 重新绘制
+                draw();
+            }, {
+                passive: false
+            });
+            document.addEventListener('mouseup', function () {
+                store = {}
+                document.removeEventListener('mousemove', null)
+                document.removeEventListener('mouseup', null)
+            });
+            let scale = 1
+            document.addEventListener('mousewheel', function (e) {
+
+                if (e.wheelDelta > 0) {
+                    context.clearRect(0, 0, width, height);
+                    scale = 0.1
+                    console.log('sc', scale)
+                    context.scale(scale, scale)
+
+                    console.log(111)
+
+                } else {
+                    context.clearRect(0, 0, width, height);
+                    scale = 1.1
+                    console.log('sc2', scale)
+                    context.scale(scale, scale)
+                    // context.scaleX(0.5)
+                    // context.scaleY(0.5)
+                }
+                draw()
+            })
+        });
+
+
+    </script>
+</body>
+
+</html>
