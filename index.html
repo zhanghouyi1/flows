@@ -139,10 +139,8 @@
         // 绘制矩形方法
         function drawRect(list) {
             list.forEach(item => {
-
                 context.save();
-                let size = 2 * 50;
-
+                
                 //长方体
                 context.beginPath();
                 context.fillStyle = item.color;
@@ -152,6 +150,7 @@
                 context.font = '40px 宋体'
                 context.fillText(item.title, item.x, item.y + 66 + 38);
                 //头像
+                const size = 2 * 50;
                 context.arc(item.x + 30, item.y + 30, 30, 0, 2 * Math.PI);
                 context.clip();
                 context.drawImage(item.url, item.x - 30, item.y - 30, size, size);
