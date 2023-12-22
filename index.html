@@ -139,8 +139,8 @@
         // 绘制矩形方法
         function drawRect(list) {
             list.forEach(item => {
-                context.save();
-                
+
+
                 //长方体
                 context.beginPath();
                 context.fillStyle = item.color;
@@ -150,6 +150,7 @@
                 context.font = '40px 宋体'
                 context.fillText(item.title, item.x, item.y + 66 + 38);
                 //头像
+                context.save();
                 const size = 2 * 50;
                 context.arc(item.x + 30, item.y + 30, 30, 0, 2 * Math.PI);
                 context.clip();
@@ -214,13 +215,13 @@
         function isClickImg(list, x, y) {
 
             list.forEach((obj, index) => {
-                console.log(x, y, obj.x, obj.y )
+                console.log(x, y, obj.x, obj.y)
                 if (x >= obj.x && x <= obj.x + 60 && y >= obj.y && y <= obj.y + 60) {
                     console.log(111)
                     resultImg = obj
                 }
                 if (x >= obj.x && x <= obj.x + 100 && y >= obj.y + 60 && y <= obj.y + 100) {
-console.log(222)
+                    console.log(222)
                     resultText = obj
                 }
                 if (obj?.child?.length) {
@@ -287,7 +288,7 @@ console.log(222)
             // 记住缩放比例
             store.scaleX = scaleX;
             store.scaleY = scaleY;
-            document.addEventListener('mousemove', function (event) {
+            canvas.addEventListener('mousemove', function (event) {
                 if (!store?.x) {
                     return;
                 }
@@ -318,10 +319,10 @@ console.log(222)
             }, {
                 passive: false
             });
-            document.addEventListener('mouseup', function () {
+            canvas.addEventListener('mouseup', function () {
                 store = {}
-                document.removeEventListener('mousemove', null)
-                document.removeEventListener('mouseup', null)
+                canvas.removeEventListener('mousemove', null)
+                canvas.removeEventListener('mouseup', null)
             });
             let scale = 1
             document.addEventListener('mousewheel', function (e) {

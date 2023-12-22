@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+        canvas {
+            display: block;
+            width: 1000px;
+            height: 600px;
+            background: conic-gradient(#eee 25%, white 0deg 50%, #eee 0deg 75%, white 0deg) 0 / 20px 20px;
+            margin-inline: auto;
+        }
+
+        @media (max-width: 640px) {
+            canvas {
+                width: 100vw;
+                height: 60vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="2000" height="1200"></canvas>
+</body>
+<script type="module">
+    import { CreateFlows } from './index.js';
+    const data = [
+        {
+           
+            type: 1,
+            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+            title: '标题3',
+            id:'11',
+            child: [
+                {
+                    src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                    title: '标题4',
+                    type: 2,
+                    id:'22',
+                    child: [
+                        {
+                            type: 3,
+                            id:'33',
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题5',
+                        },
+                        {
+                            type: 3,
+                            id:'33333',
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题53333',
+                        }
+                    ]
+                },
+                {
+                   
+                    type: 2,
+                    src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                    title: '标题6',
+                    id:'66',
+                    child: [
+                        {
+                           
+                            type: 3,
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题8',
+                            id:'88',
+                        },
+                        {
+                          
+                            type: 3,
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题88',
+                            id:'888',
+                        },
+                        {
+                          
+                            type: 3,
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题888',
+                            id:'8888',
+                        },
+                        {
+                           
+                            type: 3,
+                            src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                            title: '标题999',
+                            id:'9999',
+                        }
+                    ]
+                },
+                {
+                   
+                    type: 2,
+                    title: '标题7',
+                    id:'7777',
+                    src: 'https://img.iplaysoft.com/wp-content/uploads/2019/free-images/free_stock_photo_2x.jpg!0x0.webp',
+                },
+            ]
+        },
+    ];
+    new CreateFlows({
+        id: 'canvas',
+        data,
+        domData: {
+            rect: {
+                width: 240,
+                height: 140,
+                background: 'deepskyblue'
+            },
+            text: {
+                fontSize: '40px',
+                color: "#000",
+
+            },
+            avatar: {
+                size: 30,
+                left:16,
+                top:10
+            }
+        }
+    })
+</script>
+
+</html>
